@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'dart:async';
 
 void main() {
   runApp(const MaterialApp(
@@ -8,11 +9,45 @@ void main() {
   ));
 }
 
-class IdealMinimartHome extends StatelessWidget {
+class IdealMinimartHome extends StatefulWidget {
   const IdealMinimartHome({super.key});
 
   @override
-  Widget  build(BuildContext context) {
+  State<IdealMinimartHome> createState() => _IdealMinimartHomeState();
+}
+
+class _IdealMinimartHomeState extends State<IdealMinimartHome> {
+  late final PageController _pageController;
+  late final Timer _carouselTimer;
+  int _currentPage = 0;
+
+  final List<String> promoItems = [
+    'Order now and get 10% off!',
+    'Free delivery for orders above \$50!',
+    'Visit our food court for exclusive deals!',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0);
+    _carouselTimer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (_currentPage < promoItems.length - 1) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+
+      _pageController.animateToPage(
+        _currentPage,
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOutCubic,
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       body: Stack(
@@ -32,7 +67,7 @@ class IdealMinimartHome extends StatelessWidget {
                 ),
                 alignment: Alignment.center,
                 child: const Text(
-                  'Promo Carousele Placeholder',
+                  'Promo Carousel Placeholder',
                   style: TextStyle(
                     fontSize: 30,
                     color: Color.fromARGB(255, 221, 0, 0),
