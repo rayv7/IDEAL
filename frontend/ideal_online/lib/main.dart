@@ -23,8 +23,18 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
 
   final List<String> promoItems = [
     'Order now and get 10% off!',
-    'Free delivery for orders above \$50!',
+    'Free delivery for orders above Ksh50!',
     'Visit our food court for exclusive deals!',
+  ];
+
+  final List<String> categories = [
+    'Fruits & Vegetables',
+    'Dairy Products',
+    'Beverages',
+    'Snacks',
+    'Hot dog stand',
+    'Personal Care',
+    'Household essentials',
   ];
 
   @override
@@ -47,6 +57,13 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
   }
 
   @override
+  void dispose() {
+    _carouselTimer.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -58,21 +75,35 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
             children: [
               const SizedBox(height: 80),
 
-              Container(
+              SizedBox(
                 height: 300,
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E9),
-                  borderRadius: BorderRadius.circular(16),
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: promoItems.length,
+                  onPageChanged: (index) {
+                    _currentPage = index;
+                  },
+                  itemBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        promoItems[index],
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1B5E20),
+                        ),
+                      ),
+                    );
+                  },
                 ),
-                alignment: Alignment.center,
-                child: const Text(
-                  'Promo Carousel Placeholder',
-                  style: TextStyle(
-                    fontSize: 30,
-                    color: Color.fromARGB(255, 221, 0, 0),
-                  ),
-                ), 
               ),
               const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -81,6 +112,52 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 3, 136, 20)),
                   ),
                 ),
+                
+              SizedBox (
+                height: 110,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 65,
+                            height: 65,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.05),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: const Icon(
+                              Icons.shopping_basket_outlined,
+                              color: Colors.green,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            categories[index],
+                            style: const TextStyle(
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                        ),
+                    );
+                  }
+                ),
+              ),
             ],
           ),
           // Layer 2:
