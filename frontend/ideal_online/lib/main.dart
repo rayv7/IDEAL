@@ -37,6 +37,13 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
     'Household essentials',
   ];
 
+  final List<String> products = [
+    'Fresh Milk 1L',
+    'Premium Bread 400g',
+    'Fresh Juice 500ml',
+    'Yogurt 250g',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -158,6 +165,71 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                   }
                 ),
               ),
+              // 1. Digital Aisles Section Header Title
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                child: Text(
+                  'Digital Aisles',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              // 2. Product Items 2-Column Grid
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(), // Hands scrolling responsibility to the main page
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, // 2 items per row
+                    mainAxisSpacing: 16, // Vertical gaps
+                    crossAxisSpacing: 16, // Horizontal gaps
+                    childAspectRatio: 0.75, // Adjusts the proportional shape of the item card
+                  ),
+                  itemCount: products.length,
+                  itemBuilder: (context, index) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: const Color(0xFFEEEEEE)),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Product Image Shaded Placeholder Box
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF5F5F5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.image, color: Colors.grey),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          // Title
+                          Text(
+                            products[index],
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
+                          const SizedBox(height: 4),
+                          // Price Placeholder
+                          const Text(
+                            'KSh 60',
+                            style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              
+              // Bottom spacing layout pad so nothing cuts off abruptly
+              const SizedBox(height: 100),
             ],
           ),
           // Layer 2:
