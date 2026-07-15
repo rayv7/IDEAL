@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 250" width="100%" height="100%">
+  <defs>
+    <!-- Fonts -->
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&amp;display=swap');
+      .text-ideal {
+        font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
+        font-weight: 800;
+        font-size: 42px;
+        fill: #1B5E3A; /* Deep Green */
+        letter-spacing: 5px;
+      }
+      .text-minimart {
+        font-family: 'Montserrat', 'Helvetica Neue', sans-serif;
+        font-weight: 700;
+        font-size: 20px;
+        fill: #E05A36; /* Orange-Red */
+        letter-spacing: 8px;
+      }
+    </style>
+  </defs>
+
+  <!-- Background (Transparent) -->
+  <rect width="100%" height="100%" fill="none" />
+
+  <g id="logo-mark" transform="translate(30, 25)">
+    <!-- GROCERIES INSIDE BASKET -->
+    <!-- Bottle (Grey/Silver) -->
+    <path d="M 85,55 L 85,35 Q 85,30 90,30 L 93,30 Q 98,30 98,35 L 98,55 Z" fill="#B0B3B8" />
+    <rect x="88" y="25" width="7" height="5" rx="1" fill="#8E9196" />
+    <rect x="85" y="42" width="13" height="8" fill="#E1E2E5" opacity="0.8" />
+    
+    <!-- Bone/Meat (Light Grey/Pink-Red) -->
+    <path d="M 115,55 L 125,25 Q 128,20 133,23 L 137,25 Q 142,28 139,33 L 129,60 Z" fill="#D3D3D3" />
+    <circle cx="132" cy="21" r="5" fill="#D3D3D3" />
+    <circle cx="140" cy="26" r="5" fill="#D3D3D3" />
+    
+    <!-- Red Tomato / Apple -->
+    <circle cx="110" cy="55" r="18" fill="#C02828" />
+    <!-- Small Green Leaf on Tomato -->
+    <path d="M 110,37 Q 112,32 110,30 Q 106,33 110,37 Z" fill="#2E7D32" />
+
+    <!-- Orange / Citrus -->
+    <circle cx="130" cy="58" r="13" fill="#E65100" />
+    <circle cx="143" cy="62" r="9" fill="#F57C00" />
+
+    <!-- Left Green Leaf / Vegetable stem peaking out -->
+    <path d="M 98,50 Q 85,42 75,48 Q 85,55 98,50 Z" fill="#2E7D32" />
+
+    <!-- BASKET FRAME (Dark Green) -->
+    <!-- Basket Handle -->
+    <path d="M 105,75 L 140,20 C 143,15 148,18 145,23 L 115,75 Z" fill="#114224" />
+
+    <!-- Main Basket Body -->
+    <path d="M 68,68 L 152,68 C 156,68 158,71 156,75 L 142,128 C 141,133 137,136 132,136 L 88,136 C 83,136 79,133 78,128 L 64,75 C 62,71 64,68 68,68 Z" fill="#1B5E3A" />
+
+    <!-- Basket Top Rim Highlight -->
+    <rect x="60" y="68" width="100" height="7" rx="3.5" fill="#114224" />
+
+    <!-- Basket Vertical Slots -->
+    <rect x="80" y="83" width="7" height="40" rx="3" fill="#FFFFFF" />
+    <rect x="95" y="83" width="7" height="40" rx="3" fill="#FFFFFF" />
+    <rect x="110" y="83" width="7" height="40" rx="3" fill="#FFFFFF" />
+    <rect x="125" y="83" width="7" height="28" rx="3" fill="#FFFFFF" /> <!-- Shorter to make room for the cursor -->
+
+    <!-- WHITE CLICKING CURSOR / ARROW -->
+    <g transform="translate(115, 90)">
+      <path d="M 12,32 L 12,4 L 32,24 L 21,24 L 27,37 L 21,40 L 15,27 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round" />
+      <path d="M 12,32 L 12,4 L 32,24 L 21,24 L 27,37 L 21,40 L 15,27 Z" fill="#FFFFFF" />
+      <path d="M 13,6 L 13,29 L 17,25 L 23,38 L 25,37 L 19,24 L 28,24 Z" fill="#1B5E3A" opacity="0.1" />
+    </g>
+  </g>
+
+  <!-- TYPOGRAPHY SECTION (Shifted Left) -->
+  <g id="logo-text" transform="translate(210, 115)">
+    <!-- IDEAL -->
+    <text x="0" y="0" class="text-ideal">IDEAL</text>
+    <!-- MINIMART -->
+    <text x="3" y="38" class="text-minimart">MINIMART</text>
+  </g>
+</svg>
