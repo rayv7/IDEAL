@@ -1,0 +1,76 @@
+[11048:11048:0729/112053.015549:ERROR:components/sharing_message/sharing_service.cc:264] Device registration failed with fatal error
+[11048:11048:0729/112053.015549:ERROR:components/sharing_message/sharing_service.cc:264] Device registration failed with fatal error
+Fontconfig error: Cannot load default config file: File not found
+Fontconfig error: Cannot load default config file: File not found
+[22401:31:0729/113141.714328:ERROR:third_party/webrtc/media/sctp/dcsctp_transport.cc:559] DcSctpTransport1->OnAborted(error=PEER_REPORTED, message=User-Initiated Abort, reason=Close called).
+[22401:31:0729/113141.714328:ERROR:third_party/webrtc/media/sctp/dcsctp_transport.cc:559] DcSctpTransport1->OnAborted(error=PEER_REPORTED, message=User-Initiated Abort, reason=Close called).
+[22401:1:0729/113141.715105:ERROR:third_party/blink/renderer/modules/peerconnection/rtc_data_channel.cc:718] DataChannel error: "User-Initiated Abort, reason=Close called", code: 12
+[22401:1:0729/113141.715105:ERROR:third_party/blink/renderer/modules/peerconnection/rtc_data_channel.cc:718] DataChannel error: "User-Initiated Abort, reason=Close called", code: 12
+[OpenH264] this = 0x0x12fc120ff960, Warning:CWelsH264SVCEncoder::Initialize(), reinitialize, m_bInitialFlag= 1.
+[OpenH264] this = 0x0x12fc120ff960, Warning:CWelsH264SVCEncoder::Initialize(), reinitialize, m_bInitialFlag= 1.
+[11101:11109:0729/113357.163759:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.163759:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.165489:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.165489:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.451300:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.451300:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.474447:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113357.474447:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113358.014664:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113358.014664:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113358.536544:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113358.536544:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113359.088733:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113359.088733:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113359.570224:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/113359.570224:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/114133.356758:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114133.356758:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114135.856797:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114135.856797:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114240.388937:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114240.388937:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11048:11048:0729/114312.685305:ERROR:ui/gfx/x/atom_cache.cc:234] Add application/vnd.portal.filetransfer to kAtomsToCache
+[11048:11048:0729/114312.685305:ERROR:ui/gfx/x/atom_cache.cc:234] Add application/vnd.portal.filetransfer to kAtomsToCache
+[11048:11048:0729/114312.685552:ERROR:ui/gfx/x/atom_cache.cc:234] Add application/vnd.portal.files to kAtomsToCache
+[11048:11048:0729/114312.685552:ERROR:ui/gfx/x/atom_cache.cc:234] Add application/vnd.portal.files to kAtomsToCache
+[11101:11109:0729/114858.669585:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/114858.669585:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11048:11048:0729/115013.440529:ERROR:ui/compositor/compositor_animation_observer.cc:65] CompositorAnimationObserver is active for too long (417.903s) location=Button@ui/views/controls/button/button.cc:669
+[11048:11048:0729/115013.440529:ERROR:ui/compositor/compositor_animation_observer.cc:65] CompositorAnimationObserver is active for too long (417.903s) location=Button@ui/views/controls/button/button.cc:669
+[11101:11109:0729/120231.938549:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/120231.938549:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -101
+[11101:11109:0729/120323.184090:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120323.184090:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120324.149148:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120324.149148:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120325.142820:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120325.142820:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120327.155125:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/120327.155125:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121521.126476:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121521.126476:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.396435:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.396435:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.415998:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.415998:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.547000:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.547000:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.552427:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121525.552427:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.473488:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.473488:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.479154:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.479154:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.490137:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.490137:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.616796:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.616796:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.619253:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121530.619253:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121535.348344:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/121535.348344:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/122135.169458:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/122135.169458:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/122135.172111:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202
+[11101:11109:0729/122135.172111:ERROR:net/socket/ssl_client_socket_impl.cc:963] handshake failed; returned -1, SSL error code 1, net_error -202

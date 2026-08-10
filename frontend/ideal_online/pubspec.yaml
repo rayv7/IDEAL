@@ -38,6 +38,8 @@ dependencies:
   curved_navigation_bar: ^1.0.6
   flutter_svg: ^2.3.0
   get_storage: ^2.1.1
+  http: ^1.6.0
+  convert: ^3.0.1
 
 dev_dependencies:
   flutter_test:

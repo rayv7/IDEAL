@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ideal_online/configs/catalog_controller.dart';
 
-
 class IdealMinimartHome extends StatefulWidget {
   const IdealMinimartHome({super.key});
 
@@ -18,7 +17,9 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
   @override
   Widget build(BuildContext context) {
     // Get products for the currently clicked category
-    final filteredProducts = _catalogController.getFilteredProducts(selectedCategory);
+    final filteredProducts = _catalogController.getFilteredProducts(
+      selectedCategory,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -27,7 +28,7 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
         foregroundColor: Colors.white,
       ),
       bottomNavigationBar: CurvedNavigationBar(
-         items: [
+        items: [
           Icon(Icons.home),
           Icon(Icons.search),
           GestureDetector(
@@ -130,12 +131,13 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      childAspectRatio: 0.8,
-                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 0.8,
+                        ),
                     itemCount: filteredProducts.length,
                     itemBuilder: (context, index) {
                       final product = filteredProducts[index];
@@ -159,10 +161,17 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                                     ? Image.asset(
                                         imagePath,
                                         fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) =>
-                                            const Icon(Icons.image, color: Colors.grey),
+                                        errorBuilder:
+                                            (context, error, stackTrace) =>
+                                                const Icon(
+                                                  Icons.image,
+                                                  color: Colors.grey,
+                                                ),
                                       )
-                                    : const Icon(Icons.image, color: Colors.grey),
+                                    : const Icon(
+                                        Icons.image,
+                                        color: Colors.grey,
+                                      ),
                               ),
                             ),
                             const SizedBox(height: 8),
@@ -170,7 +179,9 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                               product['name'] ?? '',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
