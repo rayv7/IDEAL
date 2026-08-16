@@ -2,6 +2,11 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ideal_online/configs/catalog_controller.dart';
+import 'package:ideal_online/widgets/nav_bar.dart';
+
+
+
+
 
 class IdealMinimartHome extends StatefulWidget {
   const IdealMinimartHome({super.key});
@@ -22,10 +27,20 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('IDEAL Minimart'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
+      appBar: IdealAppBar(
+        logoPath: 'assets/logo_nbg.png',
+        onSearchSubmitted: (query) {
+          print('Search submitted: $query');
+          // Handle search submission
+        },
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () {
+              Get.toNamed("/login");
+            },
+          ),
+        ]
       ),
       bottomNavigationBar: CurvedNavigationBar(
         items: [
