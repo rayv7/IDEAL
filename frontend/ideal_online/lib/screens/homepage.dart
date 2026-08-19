@@ -2,10 +2,8 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ideal_online/configs/catalog_controller.dart';
+import 'package:ideal_online/widgets/bottom_nav_bar.dart';
 import 'package:ideal_online/widgets/nav_bar.dart';
-
-
-
 
 
 class IdealMinimartHome extends StatefulWidget {
@@ -15,9 +13,19 @@ class IdealMinimartHome extends StatefulWidget {
   State<IdealMinimartHome> createState() => _IdealMinimartHomeState();
 }
 
+
+
 class _IdealMinimartHomeState extends State<IdealMinimartHome> {
   final CatalogController _catalogController = CatalogController();
   String selectedCategory = 'Dairy';
+
+  int _currentIndex = 0;
+  final List<Widget> _pages = const [
+    Center(child: Text('Home Content')),
+    Center(child: Text('Categories Content')),
+    Center(child: Text('Cart Content')),
+    Center(child: Text('Account Content')),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -42,22 +50,12 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
           ),
         ]
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        items: [
-          Icon(Icons.home),
-          Icon(Icons.search),
-          GestureDetector(
-            onTap: () {
-              Get.toNamed("/profile");
-            },
-            child: Icon(Icons.person),
-          ),
-        ],
-        onTap: (index) {
-          // Handle navigation
-        },
+      bottomNavigationBar: IdealBottomNavBar(
+        currentIndex: 0,
+        onTap: (index) {}
       ),
-      body: SingleChildScrollView(
+      body:
+        SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

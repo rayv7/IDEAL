@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ideal_online/widgets/bottom_nav_bar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -24,6 +25,10 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         centerTitle: true,
+      ),
+      bottomNavigationBar: IdealBottomNavBar(
+        currentIndex: 3,
+        onTap: (index) {}
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
