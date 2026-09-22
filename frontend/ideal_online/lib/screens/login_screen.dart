@@ -89,7 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 onPressed: () async {
                                   var response = await http.get(
                                     Uri.parse(
-                                      "http://10.0.2.2/backend/login.php?phonenum=${usernameController.text}&password=${passwordController.text}",
+                                      "https://refract-strung-mama.ngrok-free.dev/backend/login.php?phonenum=${usernameController.text}&password=${passwordController.text}",
                                     ),
                                   );
                               

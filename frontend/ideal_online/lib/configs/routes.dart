@@ -7,10 +7,10 @@ import 'package:ideal_online/screens/profile_page.dart';
 import 'package:ideal_online/screens/registration_screen.dart';
 
 var routes = [
-  GetPage(name: "/", page: () => LoginScreen()),
+  GetPage(name: "/login", page: () => LoginScreen()),
   GetPage(name: "/registration", page: () => RegistrationScreen()),
-  GetPage(name: "/home", page: () => IdealMinimartHome()),
-  GetPage(name: "/profile", page: () => ProfilePage()),
-  GetPage(name: "/categories", page: () => Categories()),
-  GetPage(name: "/cart", page: () => cart()),
+  GetPage(name: "/", page: () => IdealMinimartHome()),
+  GetPage(name: "/profile", page: () => ProfileScreen()),
+  GetPage(name: "/categories", page: () => CategoriesScreen()),
+  GetPage(name: "/cart", page: () => CartScreen()),
 ];

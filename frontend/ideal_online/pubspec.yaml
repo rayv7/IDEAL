@@ -41,6 +41,7 @@ dependencies:
   http: ^1.6.0
   convert: ^3.0.1
   salomon_bottom_bar: ^3.3.2
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:

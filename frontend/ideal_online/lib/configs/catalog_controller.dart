@@ -6,7 +6,7 @@ class CatalogController {
     'Home Care',
     'Sweet & Platters',
     'Nursery',
-    'Snacks',
+    'Snacks',         
     'Beverages',
   ];
 
@@ -30,7 +30,7 @@ class CatalogController {
     {'name': 'Potato Crisps', 'category': 'Snacks', 'price': 'KSh 50'},
   ];
 
-  // Helper function to return only products belonging to the selected category
+
   List<Map<String, String>> getFilteredProducts(String selectedCategory) {
     return _allProducts
         .where((product) => product['category'] == selectedCategory)

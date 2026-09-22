@@ -1,9 +1,12 @@
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ideal_online/configs/catalog_controller.dart';
+import 'package:ideal_online/configs/colors.dart';
+import 'package:ideal_online/controllers/cart_controller.dart';
 import 'package:ideal_online/widgets/bottom_nav_bar.dart';
 import 'package:ideal_online/widgets/nav_bar.dart';
+import 'package:ideal_online/widgets/product_grid.dart';
+import 'package:ideal_online/widgets/promo_card.dart';
 
 
 class IdealMinimartHome extends StatefulWidget {
@@ -17,19 +20,11 @@ class IdealMinimartHome extends StatefulWidget {
 
 class _IdealMinimartHomeState extends State<IdealMinimartHome> {
   final CatalogController _catalogController = CatalogController();
+  final CartController cartController = Get.put(CartController());
   String selectedCategory = 'Dairy';
-
-  int _currentIndex = 0;
-  final List<Widget> _pages = const [
-    Center(child: Text('Home Content')),
-    Center(child: Text('Categories Content')),
-    Center(child: Text('Cart Content')),
-    Center(child: Text('Account Content')),
-  ];
 
   @override
   Widget build(BuildContext context) {
-    // Get products for the currently clicked category
     final filteredProducts = _catalogController.getFilteredProducts(
       selectedCategory,
     );
@@ -38,16 +33,46 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
       appBar: IdealAppBar(
         logoPath: 'assets/logo_nbg.png',
         onSearchSubmitted: (query) {
-          print('Search submitted: $query');
-          // Handle search submission
+          Get.snackbar("Coming soon!!!", "Feature currenty unavalable");
+
         },
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Get.toNamed("/login");
-            },
-          ),
+          Obx(() => Stack(
+            alignment: Alignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.shopping_cart),
+                onPressed: () {
+                  Get.toNamed('/cart');
+                },
+              ),
+              if (cartController.totalItemCount > 0)
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      '${cartController.totalItemCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          )),
         ]
       ),
       bottomNavigationBar: IdealBottomNavBar(
@@ -59,29 +84,17 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Promo Banner
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.green.shade100,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: const Text(
-                'Order now and get 10% off!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
-                ),
-              ),
-            ),
+            PromoCard(
+              title: 'GET 10% OFF',
+              subtitle: 'Order now with ideal online to get 10%off any order!',
+              buttonText: 'Order now',
+              imagePath: "assets/vegetables.jpeg", // Optional
+              onTap: () {
 
-            // Categories Header
+              },
+            ),
             const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
               child: Text(
                 'Categories',
                 style: TextStyle(
@@ -108,7 +121,7 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                     child: ChoiceChip(
                       label: Text(categoryName),
                       selected: isSelected,
-                      selectedColor: Colors.green,
+                      selectedColor: secondaryColor,
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : Colors.black,
                       ),
@@ -125,7 +138,7 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
 
             // Digital Aisles Title Header
             const Padding(
-              padding: EdgeInsets.all(16),
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Text(
                 'Digital Aisles',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -133,82 +146,18 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
             ),
 
             // Product Grid
-            filteredProducts.isEmpty
-                ? const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(20),
-                      child: Text('No products found in this category.'),
-                    ),
-                  )
-                : GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                          childAspectRatio: 0.8,
-                        ),
-                    itemCount: filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = filteredProducts[index];
-                      final imagePath = product['image'] ?? '';
-
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        padding: const EdgeInsets.all(8),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                width: double.infinity,
-                                color: Colors.grey.shade100,
-                                child: imagePath.isNotEmpty
-                                    ? Image.asset(
-                                        imagePath,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) =>
-                                                const Icon(
-                                                  Icons.image,
-                                                  color: Colors.grey,
-                                                ),
-                                      )
-                                    : const Icon(
-                                        Icons.image,
-                                        color: Colors.grey,
-                                      ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              product['name'] ?? '',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              product['price'] ?? '',
-                              style: const TextStyle(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+            ProductGrid(
+              products: filteredProducts,
+              onAddToCart: (product) {
+                cartController.addToCart(product);
+                Get.snackbar(
+                  "${product['name']} Added!",
+                  "(${cartController.cartItems[product['name']]!['quantity']} in cart)",
+                  snackPosition: SnackPosition.BOTTOM,
+                  duration: const Duration(seconds: 1),
+                );
+              },
+            ),
             const SizedBox(height: 20),
           ],
         ),
