@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class CheckoutSheet extends StatefulWidget {
   final Map<String, dynamic> cartItems;
@@ -19,274 +18,240 @@ class CheckoutSheet extends StatefulWidget {
 }
 
 class _CheckoutSheetState extends State<CheckoutSheet> {
-  final _formKey = GlobalKey<FormState>();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController();
+  String _selectedPaymentMethod = 'M-Pesa';
+  bool _isProcessing = false;
 
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  double get _grandTotal => widget.subtotal + widget.deliveryFee;
 
-  String _fulfillmentType = 'Delivery'; // 'Delivery' or 'Pickup'
-  String? _selectedHostel;
-  String? _selectedSlot;
-
-  final List<String> _hostels = [
-    'Bethel Hostel',
-    'Ebenezer Hostel',
-    'Grace Hostel',
-    'Off-Campus Residence',
-  ];
-
-  final List<String> _timeSlots = [
-    'Immediate (Within 30 mins)',
-    '12:00 PM - 2:00 PM',
-    '4:00 PM - 6:00 PM',
-  ];
-
-  double get _finalTotal {
-    return _fulfillmentType == 'Delivery'
-        ? widget.subtotal + widget.deliveryFee
-        : widget.subtotal;
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _locationController.dispose();
+    super.dispose();
   }
 
-  Future<void> _sendToWhatsApp() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_fulfillmentType == 'Delivery' && _selectedHostel == null) {
-      Get.snackbar('Error', 'Please select a hostel for delivery',
-          snackPosition: SnackPosition.BOTTOM);
+  void _handlePlaceOrder() async {
+    if (_phoneController.text.trim().isEmpty) {
+      Get.snackbar(
+        'Required Field',
+        'Please enter your phone number for payment',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.redAccent,
+        colorText: Colors.white,
+      );
       return;
     }
 
-    if (_selectedSlot == null) {
-      Get.snackbar('Error', 'Please select a time slot',
-          snackPosition: SnackPosition.BOTTOM);
-      return;
-    }
+    setState(() => _isProcessing = true);
 
-    // Build item breakdown text
-    StringBuffer itemsBuffer = StringBuffer();
-    widget.cartItems.forEach((key, value) {
-      final product = value['product'] as Map<String, String>;
-      final qty = value['quantity'];
-      itemsBuffer.writeln('• ${product['name']} x$qty - ${product['price']}');
-    });
+    await Future.delayed(const Duration(seconds: 2));
 
-    // Format WhatsApp message
-    final String message = '''
-🛒 *NEW ORDER - IDEAL MINIMART*
---------------------------------
-*Customer Details:*
-• *Name:* ${_nameController.text.trim()}
-• *Phone:* ${_phoneController.text.trim()}
-• *Type:* $_fulfillmentType
-${_fulfillmentType == 'Delivery' ? '• *Hostel:* $_selectedHostel\n' : ''}• *Slot:* $_selectedSlot
+    if (!mounted) return;
+    setState(() => _isProcessing = false);
+    Navigator.of(context).pop();
 
-*Order Items:*
-${itemsBuffer.toString()}
---------------------------------
-• *Subtotal:* Ksh ${widget.subtotal.toStringAsFixed(0)}
-• *Delivery Fee:* Ksh ${_fulfillmentType == 'Delivery' ? widget.deliveryFee.toStringAsFixed(0) : '0'}
-• *TOTAL AMOUNT:* Ksh ${_finalTotal.toStringAsFixed(0)}
-''';
-
-    // Specify merchant WhatsApp number (including country code)
-    const String whatsappNumber = '254780529965'; 
-    final Uri url = Uri.parse(
-        'https://wa.me/$whatsappNumber?text=${Uri.encodeComponent(message)}');
-
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    } else {
-      Get.snackbar('Error', 'Could not open WhatsApp',
-          snackPosition: SnackPosition.BOTTOM);
-    }
+    Get.defaultDialog(
+      title: 'Order Placed!',
+      middleText: _selectedPaymentMethod == 'M-Pesa'
+          ? 'Check your phone for the M-Pesa STK PIN prompt to complete payment.'
+          : 'Your order has been received and will be delivered shortly.',
+      textConfirm: 'OK',
+      confirmTextColor: Colors.white,
+      buttonColor: Colors.green,
+      onConfirm: () {
+        Get.back();
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.55, // Opens at ~half screen
-      minChildSize: 0.4,
-      maxChildSize: 0.95, // Allows pulling up to cover nearly whole screen
-      expand: false,
-      builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          child: ListView(
-            controller: scrollController,
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Drag handle bar
               Center(
                 child: Container(
                   width: 40,
-                  height: 5,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Checkout Summary',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ],
+              ),
+              const Divider(),
+              const SizedBox(height: 12),
+              const Text(
+                'Delivery Location',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _locationController,
+                decoration: InputDecoration(
+                  hintText: 'e.g., Bamburi, Near Mosque',
+                  prefixIcon: const Icon(Icons.location_on_outlined),
+                  border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
                   ),
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Checkout Details',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                'M-Pesa Phone Number',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(
+                  hintText: 'e.g., 0712345678',
+                  prefixIcon: const Icon(Icons.phone_android_outlined),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 12,
+                  ),
+                ),
               ),
               const SizedBox(height: 16),
-
-              Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              const Text(
+                'Payment Method',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+              ),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: const Center(child: Text('M-Pesa Express')),
+                      selected: _selectedPaymentMethod == 'M-Pesa',
+                      selectedColor: Colors.green.shade100,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => _selectedPaymentMethod = 'M-Pesa');
+                        }
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ChoiceChip(
+                      label: const Center(child: Text('Cash on Delivery')),
+                      selected: _selectedPaymentMethod == 'Cash',
+                      selectedColor: Colors.green.shade100,
+                      onSelected: (selected) {
+                        if (selected) {
+                          setState(() => _selectedPaymentMethod = 'Cash');
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    // Full Name
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Full Name',
-                        prefixIcon: Icon(Icons.person),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val!.trim().isEmpty ? 'Enter your name' : null,
-                    ),
-                    const SizedBox(height: 12),
-
-                    // Phone Number
-                    TextFormField(
-                      controller: _phoneController,
-                      keyboardType: TextInputType.phone,
-                      decoration: const InputDecoration(
-                        labelText: 'Phone Number',
-                        prefixIcon: Icon(Icons.phone),
-                        border: OutlineInputBorder(),
-                      ),
-                      validator: (val) =>
-                          val!.trim().isEmpty ? 'Enter phone number' : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Delivery vs Pickup Selection
-                    const Text('Order Type',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: const Text('Delivery'),
-                            value: 'Delivery',
-                            groupValue: _fulfillmentType,
-                            onChanged: (val) =>
-                                setState(() => _fulfillmentType = val!),
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<String>(
-                            title: const Text('Pickup'),
-                            value: 'Pickup',
-                            groupValue: _fulfillmentType,
-                            onChanged: (val) =>
-                                setState(() => _fulfillmentType = val!),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Hostel Dropdown (Only shown if Delivery selected)
-                    if (_fulfillmentType == 'Delivery') ...[
-                      DropdownButtonFormField<String>(
-                        value: _selectedHostel,
-                        decoration: const InputDecoration(
-                          labelText: 'Select Hostel',
-                          prefixIcon: Icon(Icons.location_city),
-                          border: OutlineInputBorder(),
-                        ),
-                        items: _hostels.map((hostel) {
-                          return DropdownMenuItem(
-                            value: hostel,
-                            child: Text(hostel),
-                          );
-                        }).toList(),
-                        onChanged: (val) => setState(() => _selectedHostel = val),
-                      ),
-                      const SizedBox(height: 12),
-                    ],
-
-                    // Time Slot Dropdown
-                    DropdownButtonFormField<String>(
-                      value: _selectedSlot,
-                      decoration: const InputDecoration(
-                        labelText: 'Delivery/Pickup Time Slot',
-                        prefixIcon: Icon(Icons.access_time),
-                        border: OutlineInputBorder(),
-                      ),
-                      items: _timeSlots.map((slot) {
-                        return DropdownMenuItem(
-                          value: slot,
-                          child: Text(slot),
-                        );
-                      }).toList(),
-                      onChanged: (val) => setState(() => _selectedSlot = val),
-                    ),
-                    const SizedBox(height: 20),
-
-                    // Total Calculation Readout
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text('Total to Pay:',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text(
-                            'Ksh ${_finalTotal.toStringAsFixed(0)}',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
+                    const Text(
+                      'Total Amount:',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    const SizedBox(height: 20),
-
-                    // Submit Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        onPressed: _sendToWhatsApp,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        icon: const Icon(Icons.send, color: Colors.white),
-                        label: const Text(
-                          'Place Order via WhatsApp',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
+                    Text(
+                      'Ksh ${_grandTotal.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
                       ),
                     ),
                   ],
                 ),
               ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: _isProcessing ? null : _handlePlaceOrder,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: _isProcessing
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          _selectedPaymentMethod == 'M-Pesa'
+                              ? 'Pay Ksh ${_grandTotal.toStringAsFixed(0)} via M-Pesa'
+                              : 'Place Order (Cash)',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                ),
+              ),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

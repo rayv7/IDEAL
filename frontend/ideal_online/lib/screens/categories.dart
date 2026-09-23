@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:ideal_online/configs/catalog_controller.dart';
+import 'package:ideal_online/controllers/catalog_controller.dart';
+import 'package:ideal_online/controllers/cart_controller.dart';
 import 'package:ideal_online/widgets/bottom_nav_bar.dart';
 import 'package:ideal_online/widgets/nav_bar.dart';
 import 'package:ideal_online/widgets/product_grid.dart';
@@ -13,7 +14,6 @@ class CategoriesScreen extends StatefulWidget {
 }
 
 class _CategoriesScreenState extends State<CategoriesScreen> {
-  // Encapsulated state (not global)
   bool selected = false;
   String? selectedCategory;
 
@@ -42,18 +42,52 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final catalog = CatalogController();
+    final catalog = Get.put(CatalogController());
+    final cartController = Get.put(CartController());
 
     return Scaffold(
       appBar: IdealAppBar(
         logoPath: 'assets/logo_nbg.png',
+        onSearchSubmitted: (query) {
+          Get.snackbar("Coming soon!!!", "Feature currently unavailable");
+        },
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Get.toNamed("/login");
-            },
-          ),
+          Obx(() => Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.shopping_cart),
+                    onPressed: () {
+                      Get.toNamed('/cart');
+                    },
+                  ),
+                  if (cartController.totalItemCount > 0)
+                    Positioned(
+                      right: 6,
+                      top: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                          color: Colors.red,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          '${cartController.totalItemCount}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                ],
+              )),
         ],
       ),
       body: SingleChildScrollView(
@@ -63,7 +97,6 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Unselected State: Full Category Grid
               if (!selected) ...[
                 const Text(
                   'All Categories',
@@ -73,35 +106,36 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: catalog.categories.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12.0,
-                    mainAxisSpacing: 12.0,
-                    childAspectRatio: 1.1,
-                  ),
-                  itemBuilder: (context, index) {
-                    final categoryName = catalog.categories[index];
-                    final itemCount = catalog.getFilteredProducts(categoryName).length;
+                Obx(() => GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: catalog.categories.length,
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12.0,
+                        mainAxisSpacing: 12.0,
+                        childAspectRatio: 1.1,
+                      ),
+                      itemBuilder: (context, index) {
+                        final categoryName = catalog.categories[index];
+                        final itemCount =
+                            catalog.getFilteredProducts(categoryName).length;
 
-                    return _CategoryCard(
-                      title: categoryName,
-                      icon: _getCategoryIcon(categoryName),
-                      itemCount: '$itemCount Items',
-                      onTap: () {
-                        setState(() {
-                          selected = true;
-                          selectedCategory = categoryName;
-                        });
+                        return _CategoryCard(
+                          title: categoryName,
+                          icon: _getCategoryIcon(categoryName),
+                          itemCount: '$itemCount Items',
+                          onTap: () {
+                            setState(() {
+                              selected = true;
+                              selectedCategory = categoryName;
+                            });
+                          },
+                        );
                       },
-                    );
-                  },
-                ),
+                    )),
               ] else ...[
-                // Selected State: Header with Back Action
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -129,42 +163,46 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   ],
                 ),
                 const SizedBox(height: 12),
-
-                // Horizontal Category Selection Strip
                 SizedBox(
                   height: 105,
-                  child: GridView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: catalog.categories.length,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
-                      crossAxisSpacing: 12.0,
-                      mainAxisSpacing: 12.0,
-                      childAspectRatio: 1.0,
-                    ),
-                    itemBuilder: (context, index) {
-                      final categoryName = catalog.categories[index];
-                      final itemCount = catalog.getFilteredProducts(categoryName).length;
+                  child: Obx(() => ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: catalog.categories.length,
+                        itemBuilder: (context, index) {
+                          final categoryName = catalog.categories[index];
+                          final itemCount =
+                              catalog.getFilteredProducts(categoryName).length;
 
-                      return _CategoryCard(
-                        title: categoryName,
-                        icon: _getCategoryIcon(categoryName),
-                        itemCount: '$itemCount Items',
-                        isSelected: categoryName == selectedCategory,
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = categoryName;
-                          });
+                          return Container(
+                            width: 100,
+                            margin: const EdgeInsets.only(right: 12),
+                            child: _CategoryCard(
+                              title: categoryName,
+                              icon: _getCategoryIcon(categoryName),
+                              itemCount: '$itemCount Items',
+                              isSelected: categoryName == selectedCategory,
+                              onTap: () {
+                                setState(() {
+                                  selectedCategory = categoryName;
+                                });
+                              },
+                            ),
+                          );
                         },
-                      );
-                    },
-                  ),
+                      )),
                 ),
                 const SizedBox(height: 20),
-
-                // Filtered Products Display
                 ProductGrid(
-                  products: catalog.getFilteredProducts(selectedCategory ?? ''),
+                  selectedCategory: selectedCategory ?? '',
+                  onAddToCart: (product) {
+                    cartController.addToCart(product);
+                    Get.snackbar(
+                      'Added to Cart',
+                      '${product['name']} added to your cart',
+                      snackPosition: SnackPosition.BOTTOM,
+                      duration: const Duration(seconds: 1),
+                    );
+                  },
                 ),
               ],
             ],
@@ -203,7 +241,8 @@ class _CategoryCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(12.0),
       child: Container(
         decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.08) : Colors.grey[100],
+          color:
+              isSelected ? primaryColor.withOpacity(0.08) : Colors.grey[100],
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey[300]!,

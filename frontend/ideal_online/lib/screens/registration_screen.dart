@@ -1,20 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
 import '../configs/colors.dart';
 import '../configs/styles.dart';
-
-bool registering = false;
-
-TextEditingController firstNameController = TextEditingController();
-TextEditingController secondNameController = TextEditingController();
-TextEditingController emailController = TextEditingController();
-TextEditingController phoneNumberController = TextEditingController();
-TextEditingController passwordController = TextEditingController();
-TextEditingController confirmPasswordController = TextEditingController();
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -24,30 +13,42 @@ class RegistrationScreen extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
+  bool registering = false;
+
+  final TextEditingController firstNameController = TextEditingController();
+  final TextEditingController secondNameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    firstNameController.dispose();
+    secondNameController.dispose();
+    emailController.dispose();
+    phoneNumberController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Register - IDEAL MINIMART',
           style: TextStyle(
-            fontSize: 30,
+            fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.white,
-            fontFamily: 'Times New Roman',
           ),
         ),
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.exit_to_app),
-            onPressed: () {
-              // Handle exit button press
-            },
-          ),
-        ],
       ),
       body: Stack(
         children: [
@@ -61,89 +62,76 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
             child: Center(
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.only(left: 20, right: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Card(
-                  elevation: 18, // Elevation creates the floating depth effect
+                  elevation: 18,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Padding( 
-                    padding: const EdgeInsets.all(20.0),  
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            Flexible(child: Image.asset("assets/logo_nbg.png")),
+                            Flexible(
+                                child: Image.asset("assets/logo_nbg.png")),
                           ],
                         ),
-                        Text(
-                          "First name",
-                          style: subHeader,
-                        ),
+                        Text("First name", style: subHeader),
                         TextField(
                           controller: firstNameController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.person),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Second name",
-                          style: subHeader,
-                        ),
+                        const SizedBox(height: 16),
+                        Text("Second name", style: subHeader),
                         TextField(
                           controller: secondNameController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
-                            prefixIcon: Icon(Icons.lock),
+                            prefixIcon: Icon(Icons.person_outline),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "email",
-                          style: subHeader,
-                        ),
+                        const SizedBox(height: 16),
+                        Text("Email", style: subHeader),
                         TextField(
                           controller: emailController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.email),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Phone number",
-                          style: subHeader,
-                        ),
+                        const SizedBox(height: 16),
+                        Text("Phone number", style: subHeader),
                         TextField(
                           controller: phoneNumberController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             border: OutlineInputBorder(),
                             prefixIcon: Icon(Icons.phone),
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Password",
-                          style: subHeader,
-                        ),
+                        const SizedBox(height: 16),
+                        Text("Password", style: subHeader),
                         TextField(
                           controller: passwordController,
-                          decoration: InputDecoration(border: OutlineInputBorder()),
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder()),
                         ),
-                        SizedBox(height: 20),
-                        Text(
-                          "Confirm password",
-                          style: subHeader,
-                        ),
+                        const SizedBox(height: 16),
+                        Text("Confirm password", style: subHeader),
                         TextField(
                           controller: confirmPasswordController,
-                          decoration: InputDecoration(border: OutlineInputBorder()),
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                              border: OutlineInputBorder()),
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -151,15 +139,18 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               height: 50,
                               minWidth: 200,
                               onPressed: () async {
-                                if (passwordController.text != confirmPasswordController.text) {
-                                  Get.snackbar("Error", "Passwords do not match.");
+                                if (passwordController.text !=
+                                    confirmPasswordController.text) {
+                                  Get.snackbar(
+                                      "Error", "Passwords do not match.");
                                   return;
                                 } else if (firstNameController.text.isEmpty ||
                                     secondNameController.text.isEmpty ||
                                     emailController.text.isEmpty ||
                                     phoneNumberController.text.isEmpty ||
                                     passwordController.text.isEmpty) {
-                                    Get.snackbar("Error", "Please fill in all fields.");
+                                  Get.snackbar(
+                                      "Error", "Please fill in all fields.");
                                   return;
                                 } else {
                                   setState(() {
@@ -167,7 +158,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   });
                                   try {
                                     var response = await http.post(
-                                      Uri.parse("http://10.0.2.2/backend/create.php"),
+                                      Uri.parse(
+                                          "http://10.0.2.2/backend/create.php"),
                                       body: {
                                         "fname": firstNameController.text,
                                         "sname": secondNameController.text,
@@ -177,49 +169,54 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       },
                                     );
 
-                                    var serverResponse = jsonDecode(response.body);
-                                    
+                                    var serverResponse =
+                                        jsonDecode(response.body);
+
                                     if (serverResponse['success'] == 1) {
-                                      Get.snackbar("Success", "Registration successful, Welcome to IDEAL MINIMART ${firstNameController.text}");
+                                      Get.snackbar("Success",
+                                          "Welcome to IDEAL MINIMART ${firstNameController.text}");
                                       Get.toNamed("/login");
                                     } else {
-                                      Get.snackbar("Error", "Registration failed, please try again.");
+                                      Get.snackbar("Error",
+                                          "Registration failed, please try again.");
                                     }
                                   } catch (e) {
-                                    Get.snackbar("Connection Error", "Could not connect to server: $e");
+                                    Get.snackbar("Connection Error",
+                                        "Could not connect to server: $e");
                                   } finally {
                                     setState(() {
                                       registering = false;
                                     });
                                   }
                                 }
-                              },  
+                              },
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               color: buttonColor,
-                              child: registering 
-                                ? CircularProgressIndicator()
-                                : Text(
-                                "Sign up",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
+                              child: registering
+                                  ? const CircularProgressIndicator(
+                                      color: Colors.white)
+                                  : const Text(
+                                      "Sign up",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                             ),
                           ],
                         ),
-                        SizedBox(height: 20),
+                        const SizedBox(height: 20),
                       ],
-                    )
+                    ),
                   ),
                 ),
+              ),
             ),
           ),
-        ),
-      ]
+        ],
       ),
     );
   }

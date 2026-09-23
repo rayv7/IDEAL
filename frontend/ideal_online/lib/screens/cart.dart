@@ -12,22 +12,15 @@ class CartScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Find the global instance of CartController
-    final CartController cartController = Get.find<CartController>();
+    final CartController cartController = Get.put(CartController());
 
     return Scaffold(
       appBar: IdealAppBar(
         logoPath: 'assets/logo_nbg.png',
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              Get.toNamed("/login");
-            },
-          ),
+      
         ],
       ),
-      // Obx listens to reactive changes in CartController
       body: Obx(() {
         final itemsList = cartController.cartItems.values.toList();
 
@@ -77,19 +70,17 @@ class CartScreen extends StatelessWidget {
           );
         }
 
-        // Calculate subtotal directly from reactive items list
         final double subtotal = itemsList.fold(0.0, (sum, entry) {
           final product = entry['product'] as Map<String, String>;
           final quantity = entry['quantity'] as int;
-          // Clean price string (e.g. "Ksh 65" -> 65.0)
-          final priceString = product['price']?.replaceAll(RegExp(r'[^0-9.]'), '') ?? '0';
+          final priceString =
+              product['price']?.replaceAll(RegExp(r'[^0-9.]'), '') ?? '0';
           final price = double.tryParse(priceString) ?? 0.0;
           return sum + (price * quantity);
         });
 
         return Column(
           children: [
-            // 1. Cart Items List
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.all(16),
@@ -131,7 +122,6 @@ class CartScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         child: Row(
                           children: [
-                            // Item Thumbnail Image
                             Container(
                               width: 60,
                               height: 60,
@@ -156,8 +146,6 @@ class CartScreen extends StatelessWidget {
                                     ),
                             ),
                             const SizedBox(width: 12),
-
-                            // Title & Price Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,8 +170,6 @@ class CartScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-
-                            // Quantity Adjuster (- quantity +)
                             Container(
                               decoration: BoxDecoration(
                                 color: Colors.grey[100],
@@ -236,8 +222,6 @@ class CartScreen extends StatelessWidget {
                 },
               ),
             ),
-
-            // 2. Order Summary Container
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -274,8 +258,6 @@ class CartScreen extends StatelessWidget {
                     isTotal: true,
                   ),
                   const SizedBox(height: 16),
-
-                  // Checkout CTA Button
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -284,8 +266,8 @@ class CartScreen extends StatelessWidget {
                         showModalBottomSheet(
                           context: context,
                           isScrollControlled: true,
-                          backgroundColor: Colors.transparent, // Required for clean rounded corners
-                          barrierColor: Colors.black.withOpacity(0.5), // Blurs/darkens background
+                          backgroundColor: Colors.transparent,
+                          barrierColor: Colors.black.withOpacity(0.5),
                           builder: (context) {
                             return CheckoutSheet(
                               cartItems: cartController.cartItems,
@@ -294,7 +276,6 @@ class CartScreen extends StatelessWidget {
                             );
                           },
                         );
-                        // Proceed to Checkout / Daraja M-Pesa logic
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,

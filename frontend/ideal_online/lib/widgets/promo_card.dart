@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ideal_online/configs/colors.dart';
+
 
 class PromoCard extends StatelessWidget {
   final String title;

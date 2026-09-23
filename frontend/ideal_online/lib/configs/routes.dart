@@ -5,6 +5,7 @@ import 'package:ideal_online/screens/homepage.dart';
 import 'package:ideal_online/screens/login_screen.dart';
 import 'package:ideal_online/screens/profile_page.dart';
 import 'package:ideal_online/screens/registration_screen.dart';
+import 'package:ideal_online/screens/admin_dashboard.dart';
 
 var routes = [
   GetPage(name: "/login", page: () => LoginScreen()),
@@ -13,4 +14,5 @@ var routes = [
   GetPage(name: "/profile", page: () => ProfileScreen()),
   GetPage(name: "/categories", page: () => CategoriesScreen()),
   GetPage(name: "/cart", page: () => CartScreen()),
+  GetPage(name: "/admin", page: () => AdminDashboardScreen())
 ];
