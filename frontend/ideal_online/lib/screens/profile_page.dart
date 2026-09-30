@@ -66,7 +66,7 @@ class ProfileScreen extends StatelessWidget {
                   CircleAvatar(
                     radius: 45,
                     backgroundColor:
-                        Theme.of(context).primaryColor.withOpacity(0.1),
+                        Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     child: Icon(
                       Icons.person,
                       size: 50,
@@ -132,7 +132,7 @@ class ProfileScreen extends StatelessWidget {
               iconColor: Colors.red,
               textColor: Colors.red,
               onTap: () {
-                Get.toNamed("/admin");
+                Get.toNamed("/login");
               },
             ),
             const SizedBox(height: 20),

@@ -118,7 +118,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         childAspectRatio: 1.1,
                       ),
                       itemBuilder: (context, index) {
-                        final categoryName = catalog.categories[index];
+                        final categoryItem = catalog.categories[index];
+                        final categoryName = categoryItem.name;
                         final itemCount =
                             catalog.getFilteredProducts(categoryName).length;
 
@@ -169,7 +170,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                         scrollDirection: Axis.horizontal,
                         itemCount: catalog.categories.length,
                         itemBuilder: (context, index) {
-                          final categoryName = catalog.categories[index];
+                          final categoryItem = catalog.categories[index];
+                          final categoryName = categoryItem.name;
                           final itemCount =
                               catalog.getFilteredProducts(categoryName).length;
 
@@ -242,7 +244,7 @@ class _CategoryCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color:
-              isSelected ? primaryColor.withOpacity(0.08) : Colors.grey[100],
+              isSelected ? primaryColor.withValues(alpha: 0.08) : Colors.grey[100],
           borderRadius: BorderRadius.circular(12.0),
           border: Border.all(
             color: isSelected ? primaryColor : Colors.grey[300]!,
@@ -254,7 +256,7 @@ class _CategoryCard extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: primaryColor.withOpacity(0.1),
+              backgroundColor: primaryColor.withValues(alpha: 0.1),
               child: Icon(
                 icon,
                 size: 24,

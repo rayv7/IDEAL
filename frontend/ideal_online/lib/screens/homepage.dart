@@ -100,8 +100,9 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     itemCount: _catalogController.categories.length,
                     itemBuilder: (context, index) {
-                      final categoryName =
+                      final categoryItem =
                           _catalogController.categories[index];
+                      final categoryName = categoryItem.name;
                       final isSelected = categoryName == selectedCategory;
 
                       return Padding(

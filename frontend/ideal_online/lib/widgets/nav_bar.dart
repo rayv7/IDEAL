@@ -22,7 +22,7 @@ class IdealAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 1,
-      backgroundColor: secondaryColor.withOpacity(0.9),
+      backgroundColor: secondaryColor.withValues(alpha: 0.9),
       centerTitle: true,
       titleSpacing: 8,
       leadingWidth: 100,

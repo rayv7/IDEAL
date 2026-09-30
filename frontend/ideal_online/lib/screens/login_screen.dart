@@ -6,10 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:ideal_online/configs/colors.dart';
 import '../configs/styles.dart';
 
-final TextEditingController usernameController = TextEditingController();
-final TextEditingController passwordController = TextEditingController();
-final GetStorage store = GetStorage();
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -18,10 +14,25 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final GetStorage store = GetStorage();
+
+  // SPECIAL ADMIN CREDENTIALS
+  static const String adminUsername = "admin";
+  static const String adminPassword = "Admin123Pass!";
+
   @override
   void initState() {
     super.initState();
     usernameController.text = store.read("username") ?? "";
+  }
+
+  @override
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,7 +65,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Flexible(
-                                  child: Image.asset("assets/logo_nbg.png")),
+                                child: Image.asset("assets/logo_nbg.png"),
+                              ),
                             ],
                           ),
                           Text(
@@ -91,10 +103,39 @@ class _LoginScreenState extends State<LoginScreen> {
                                 height: 50,
                                 minWidth: 200,
                                 onPressed: () async {
+                                  final username = usernameController.text.trim();
+                                  final password = passwordController.text.trim();
+
+                                  if (username.isEmpty || password.isEmpty) {
+                                    Get.snackbar(
+                                      "Error",
+                                      "Please enter both username and password",
+                                    );
+                                    return;
+                                  }
+
+                                  // 1. CHECK FOR ADMIN CREDENTIALS FIRST
+                                  if (username == adminUsername &&
+                                      password == adminPassword) {
+                                    store.write("is_admin", true);
+                                    store.write("username", username);
+
+                                    Get.snackbar(
+                                      "Admin Portal",
+                                      "Welcome back, Admin!",
+                                      backgroundColor: Colors.green,
+                                      colorText: Colors.white,
+                                    );
+
+                                    Get.toNamed("/admin");
+                                    return;
+                                  }
+
+                                  // 2. STANDARD CUSTOMER LOGIN VIA PHP BACKEND
                                   try {
                                     var response = await http.get(
                                       Uri.parse(
-                                        "http://10.0.2.2/backend/login.php?phonenum=${usernameController.text}&password=${passwordController.text}",
+                                        "http://10.0.2.2/backend/login.php?phonenum=$username&password=$password",
                                       ),
                                     );
 
@@ -103,24 +144,32 @@ class _LoginScreenState extends State<LoginScreen> {
                                     int loggedIn = responseBody['success'];
 
                                     if (loggedIn == 1) {
+                                      store.write("is_admin", false);
+                                      store.write("username", username);
                                       store.write(
-                                          "username", usernameController.text);
-                                      store.write("userID",
-                                          responseBody['data'][0]['id']);
+                                        "userID",
+                                        responseBody['data'][0]['id'],
+                                      );
                                       store.write(
                                         "firstname",
                                         responseBody['data'][0]['fname'],
                                       );
                                       Get.toNamed("/home");
                                       Get.snackbar(
-                                          "Success", "Logged in successfully");
+                                        "Success",
+                                        "Logged in successfully",
+                                      );
                                     } else {
-                                      Get.snackbar("Error",
-                                          "Invalid username or password");
+                                      Get.snackbar(
+                                        "Error",
+                                        "Invalid username or password",
+                                      );
                                     }
                                   } catch (e) {
-                                    Get.snackbar("Error",
-                                        "Could not connect to backend server");
+                                    Get.snackbar(
+                                      "Error",
+                                      "Could not connect to backend server",
+                                    );
                                   }
                                 },
                                 shape: RoundedRectangleBorder(
@@ -146,7 +195,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 child: Text(
                                   "Not registered? Sign up.",
                                   style: TextStyle(
-                                      color: linkColor, fontSize: 12),
+                                    color: linkColor,
+                                    fontSize: 12,
+                                  ),
                                 ),
                                 onTap: () {
                                   Get.toNamed("/registration");
@@ -155,8 +206,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               const Spacer(),
                               Text(
                                 "Forgot password?",
-                                style:
-                                    TextStyle(color: linkColor, fontSize: 12),
+                                style: TextStyle(
+                                  color: linkColor,
+                                  fontSize: 12,
+                                ),
                               ),
                             ],
                           ),

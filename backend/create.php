@@ -2,6 +2,7 @@
 require 'connect.php';
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
+
 $fname = $_POST["fname"];
 $sname = $_POST["sname"];
 $phonenum = $_POST["phonenum"];

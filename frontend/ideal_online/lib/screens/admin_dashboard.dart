@@ -1,7 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ideal_online/controllers/catalog_controller.dart';
 import 'package:ideal_online/configs/colors.dart';
+import 'package:http/http.dart' as http;
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -45,22 +49,62 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       textCancel: 'Cancel',
       confirmTextColor: Colors.white,
       buttonColor: primaryColor,
-      onConfirm: () {
-        if (categoryController.text.trim().isNotEmpty) {
-          catalogController.addCategory(categoryController.text.trim());
-          Get.back();
-          Get.snackbar('Success', 'Category added successfully',
-              snackPosition: SnackPosition.BOTTOM);
+      onConfirm: () async {
+        final categoryName = categoryController.text.trim();
+        if (categoryName.isNotEmpty) {
+          try {
+            var response = await http.post(
+              Uri.parse('http://10.0.2.2/backend/add_category.php'),
+              body: {'name': categoryName},
+            );
+
+            var body = jsonDecode(response.body);
+
+            if (body['success'] == 1) {
+              Get.back();
+              Get.snackbar(
+                'Success',
+                'Category "$categoryName" saved to database',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.green,
+                colorText: Colors.white,
+              );
+              await catalogController.fetchCategoriesFromBackend();
+            } else {
+              Get.snackbar(
+                'Error',
+                body['message'] ?? 'Failed to add category',
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: Colors.redAccent,
+                colorText: Colors.white,
+              );
+            }
+          } catch (e) {
+            Get.snackbar(
+              'Error',
+              'Could not connect to backend server',
+              snackPosition: SnackPosition.BOTTOM,
+              backgroundColor: Colors.redAccent,
+              colorText: Colors.white,
+            );
+          }
         }
       },
     );
   }
 
   void _showAddProductModal(BuildContext context) {
+    // Ensure we have fresh categories from backend when opening modal
+    catalogController.fetchCategoriesFromBackend();
+
     final nameController = TextEditingController();
     final priceController = TextEditingController();
+    final unitAmountController = TextEditingController();
     final imagePathController = TextEditingController();
-    String selectedCategory = catalogController.categories.first;
+
+    String selectedUnitType = 'Litres (L)';
+    String? selectedCategoryId;
+    File? pickedImageFile;
 
     showModalBottomSheet(
       context: context,
@@ -71,6 +115,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
+            Future<void> pickImage() async {
+              final picker = ImagePicker();
+              final XFile? image =
+                  await picker.pickImage(source: ImageSource.gallery);
+              if (image != null) {
+                setModalState(() {
+                  pickedImageFile = File(image.path);
+                  imagePathController.text = image.path;
+                });
+              }
+            }
+
             return Padding(
               padding: EdgeInsets.only(
                 left: 20,
@@ -105,29 +161,133 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                       ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: selectedCategory,
-                      decoration: const InputDecoration(
-                        labelText: 'Category',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: catalogController.categories
-                          .map((cat) => DropdownMenuItem(
-                                value: cat,
-                                child: Text(cat),
-                              ))
-                          .toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setModalState(() => selectedCategory = val);
-                        }
-                      },
+
+                    // Unit Amount and Type
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: TextField(
+                            controller: unitAmountController,
+                            keyboardType: TextInputType.number,
+                            decoration: const InputDecoration(
+                              labelText: 'Amount (e.g. 1, 500)',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField<String>(
+                            value: selectedUnitType,
+                            decoration: const InputDecoration(
+                              labelText: 'Unit Type',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: [
+                              'Litres (L)',
+                              'Millilitres (ml)',
+                              'Kilograms (Kg)',
+                              'Grams (g)',
+                              'Packs',
+                              'Pieces'
+                            ]
+                                .map((unit) => DropdownMenuItem(
+                                      value: unit,
+                                      child: Text(unit),
+                                    ))
+                                .toList(),
+                            onChanged: (val) {
+                              if (val != null) {
+                                setModalState(() => selectedUnitType = val);
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Dynamic Category Selection
+                    Obx(() {
+                      final categoriesList = catalogController.categories;
+                      if (categoriesList.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(
+                            'No categories found in database. Tap + above to add one.',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        );
+                      }
+
+                      // Ensure selectedCategoryId matches a valid ID in the list
+                      if (selectedCategoryId == null ||
+                          !categoriesList.any((c) => c.id == selectedCategoryId)) {
+                        selectedCategoryId = categoriesList.first.id;
+                      }
+
+                      return DropdownButtonFormField<String>(
+                        value: selectedCategoryId,
+                        decoration: const InputDecoration(
+                          labelText: 'Category',
+                          border: OutlineInputBorder(),
+                        ),
+                        items: categoriesList
+                            .map((cat) => DropdownMenuItem(
+                                  value: cat.id,
+                                  child: Text(cat.name),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() => selectedCategoryId = val);
+                          }
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 12),
+
+                    // Image Picker Section
+                    Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          child: pickedImageFile != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.file(
+                                    pickedImageFile!,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Icon(Icons.image, color: Colors.grey),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: pickImage,
+                            icon: const Icon(Icons.photo_library),
+                            label: const Text('Pick Image from Gallery'),
+                            style: OutlinedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 12),
                     TextField(
                       controller: imagePathController,
                       decoration: const InputDecoration(
-                        labelText: 'Image Asset Path (Optional)',
+                        labelText: 'Or Paste Image URL / Asset Path',
                         hintText: 'assets/placeholder.png',
                         border: OutlineInputBorder(),
                       ),
@@ -140,31 +300,86 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           final name = nameController.text.trim();
-                          final price = double.tryParse(priceController.text) ?? 0.0;
-                          final image = imagePathController.text.trim().isEmpty
-                              ? 'assets/placeholder.png'
-                              : imagePathController.text.trim();
+                          final price = priceController.text.trim();
+                          final unitAmount = unitAmountController.text.trim();
+                          final unitLabel = selectedUnitType
+                              .split(' ')
+                              .last
+                              .replaceAll('(', '')
+                              .replaceAll(')', '');
+                          final fullUnit = unitAmount.isNotEmpty
+                              ? '$unitAmount $unitLabel'
+                              : unitLabel;
 
-                          if (name.isNotEmpty && price > 0) {
-                            final newProduct = Product(
-                              id: DateTime.now().millisecondsSinceEpoch.toString(),
-                              name: name,
-                              category: selectedCategory,
-                              price: price,
-                              imagePath: image,
-                            );
+                          if (name.isNotEmpty &&
+                              price.isNotEmpty &&
+                              selectedCategoryId != null) {
+                            try {
+                              var request = http.MultipartRequest(
+                                'POST',
+                                Uri.parse('http://10.0.2.2/backend/add_product.php'),
+                              );
 
-                            catalogController.addProduct(newProduct);
-                            Get.back();
-                            Get.snackbar('Success', '$name added to inventory',
-                                snackPosition: SnackPosition.BOTTOM);
-                          } else {
-                            Get.snackbar('Error', 'Please provide valid details',
+                              request.fields['name'] = name;
+                              request.fields['price'] = price;
+                              request.fields['category_id'] = selectedCategoryId!;
+                              request.fields['unit'] = fullUnit;
+                              request.fields['quantity'] = '50';
+                              request.fields['description'] = 'Product description';
+
+                              if (pickedImageFile != null) {
+                                request.files.add(
+                                  await http.MultipartFile.fromPath(
+                                      'image', pickedImageFile!.path),
+                                );
+                              } else if (imagePathController.text.isNotEmpty) {
+                                request.fields['image_url'] =
+                                    imagePathController.text.trim();
+                              }
+
+                              var streamedResponse = await request.send();
+                              var response =
+                                  await http.Response.fromStream(streamedResponse);
+
+                              if (response.statusCode == 200) {
+                                Get.back();
+                                await catalogController.fetchProductsFromBackend();
+
+                                Get.snackbar(
+                                  'Success',
+                                  '$name saved to database successfully',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: Colors.green,
+                                  colorText: Colors.white,
+                                );
+                              } else {
+                                Get.snackbar(
+                                  'Error',
+                                  'Server status code: ${response.statusCode}',
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: Colors.redAccent,
+                                  colorText: Colors.white,
+                                );
+                              }
+                            } catch (e) {
+                              Get.snackbar(
+                                'Error',
+                                'Could not connect to backend server',
                                 snackPosition: SnackPosition.BOTTOM,
                                 backgroundColor: Colors.redAccent,
-                                colorText: Colors.white);
+                                colorText: Colors.white,
+                              );
+                            }
+                          } else {
+                            Get.snackbar(
+                              'Error',
+                              'Please fill in product name, price, and select a category',
+                              snackPosition: SnackPosition.BOTTOM,
+                              backgroundColor: Colors.redAccent,
+                              colorText: Colors.white,
+                            );
                           }
                         },
                         child: const Text(
@@ -230,9 +445,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
 
   Widget _buildInventoryTab() {
     return Obx(() {
+      if (catalogController.isLoading.value) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
       final products = catalogController.products;
       if (products.isEmpty) {
-        return const Center(child: Text('No products available.'));
+        return const Center(child: Text('No products available in database.'));
       }
 
       return ListView.builder(
@@ -240,6 +459,28 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         itemCount: products.length,
         itemBuilder: (context, index) {
           final item = products[index];
+
+          Widget leadingImage;
+          if (item.imagePath.startsWith('http')) {
+            leadingImage = Image.network(
+              item.imagePath,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(Icons.image),
+            );
+          } else if (File(item.imagePath).existsSync()) {
+            leadingImage = Image.file(
+              File(item.imagePath),
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(Icons.image),
+            );
+          } else {
+            leadingImage = Image.asset(
+              item.imagePath,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => const Icon(Icons.image),
+            );
+          }
+
           return Card(
             elevation: 1.5,
             margin: const EdgeInsets.symmetric(vertical: 6),
@@ -251,14 +492,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Image.asset(
-                  item.imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(Icons.image),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: leadingImage,
                 ),
               ),
-              title: Text(item.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('${item.category} • Ksh ${item.price.toStringAsFixed(0)}'),
+              title: Text(item.name,
+                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Text(
+                  '${item.category} • ${item.unit} • Ksh ${item.price.toStringAsFixed(0)}'),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -270,7 +512,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     icon: const Icon(Icons.delete_outline, color: Colors.red),
                     onPressed: () {
                       catalogController.removeProduct(item.id);
-                      Get.snackbar('Deleted', '${item.name} removed from inventory');
+                      Get.snackbar(
+                          'Deleted', '${item.name} removed from inventory');
                     },
                   ),
                 ],
@@ -315,7 +558,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   }
 
   Widget _buildOrdersTab() {
-    // Sample mockup orders list for management
     final orders = [
       {
         'id': 'ORD-1002',
@@ -357,7 +599,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     Chip(
                       label: Text(
                         order['status']!,
-                        style: const TextStyle(fontSize: 12, color: Colors.white),
+                        style: const TextStyle(
+                            fontSize: 12, color: Colors.white),
                       ),
                       backgroundColor: order['status'] == 'Processing'
                           ? Colors.orange
@@ -381,7 +624,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                           fontSize: 15),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: primaryColor),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor),
                       onPressed: () {
                         Get.snackbar('Order Updated',
                             'Marked ${order['id']} as Completed');

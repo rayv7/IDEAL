@@ -40,8 +40,8 @@ class PromoCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: hasImage
-                ? Colors.black.withOpacity(0.15)
-                : fallbackColor.withOpacity(0.3),
+                ? Colors.black.withValues(alpha: 0.15)
+                : fallbackColor.withValues(alpha: 0.3),
             blurRadius: 8.0,
             offset: const Offset(0, 4),
           ),
@@ -58,8 +58,8 @@ class PromoCard extends StatelessWidget {
                   begin: Alignment.centerLeft,
                   end: Alignment.centerRight,
                   colors: [
-                    Colors.black.withOpacity(0.75),
-                    Colors.black.withOpacity(0.3),
+                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withValues(alpha: 0.3),
                     Colors.transparent,
                   ],
                 ),
@@ -87,7 +87,7 @@ class PromoCard extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     fontSize: 14.0,
                   ),
                   maxLines: 2,

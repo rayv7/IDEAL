@@ -91,7 +91,7 @@ class _ProductCard extends StatelessWidget {
                     ? Image.asset(
                         product.imagePath,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Icon(
+                        errorBuilder: (_, _, _) => const Icon(
                           Icons.image_not_supported_outlined,
                           size: 40,
                           color: Colors.grey,
