@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:ideal_online/controllers/cart_controller.dart';
@@ -129,21 +130,27 @@ class CartScreen extends StatelessWidget {
                                 color: Colors.grey[100],
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              child: product['image'] != null &&
-                                      product['image']!.isNotEmpty
-                                  ? Image.asset(
-                                      product['image']!,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (context, error, stack) =>
-                                          const Icon(
-                                        Icons.image,
-                                        color: Colors.grey,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: product['image'] != null && product['image']!.startsWith('http')
+                                    ? CachedNetworkImage(
+                                        imageUrl: product['image']!,
+                                        fit: BoxFit.cover,
+                                        placeholder: (context, url) => const Center(
+                                          child: SizedBox(
+                                            width: 15,
+                                            height: 15,
+                                            child: CircularProgressIndicator(strokeWidth: 2),
+                                          ),
+                                        ),
+                                        errorWidget: (context, url, error) => const Icon(Icons.image, color: Colors.grey),
+                                      )
+                                    : Image.asset(
+                                        product['image']?.isNotEmpty == true ? product['image']! : 'assets/placeholder.png',
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => const Icon(Icons.image, color: Colors.grey),
                                       ),
-                                    )
-                                  : const Icon(
-                                      Icons.image,
-                                      color: Colors.grey,
-                                    ),
+                              ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

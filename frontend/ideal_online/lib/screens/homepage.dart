@@ -71,80 +71,106 @@ class _IdealMinimartHomeState extends State<IdealMinimartHome> {
         currentIndex: 0,
         onTap: (index) {},
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            PromoCard(
-              title: 'GET 10% OFF',
-              subtitle: 'Order now with ideal online to get 10% off any order!',
-              buttonText: 'Order now',
-              imagePath: "assets/vegetables.jpeg",
-              onTap: () {},
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
-              child: Text(
-                'Categories',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green,
+      body: RefreshIndicator(
+        color: primaryColor,
+        onRefresh: () async {
+          await _catalogController.fetchProductsFromBackend();
+          await _catalogController.fetchCategoriesFromBackend();
+        },
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PromoCarousel(
+                cards: [
+                  PromoCard(
+                    title: 'GET 10% OFF',
+                    subtitle: 'Order now with ideal online to get 10% off any order!',
+                    buttonText: 'Order now',
+                    imagePath: "assets/Shop-face.jpeg",
+                    onTap: () {},
+                  ),
+                  PromoCard(
+                    title: 'Advertise with us.',
+                    subtitle: 'contact (+254)758-877-568 for a chance to get your product out there.',
+                    buttonText: 'Contact Us',
+                    imagePath: "assets/Advertise.jpeg",
+                    onTap: () {},
+                  ),
+                  PromoCard(
+                    title: 'SAME DAY DELIVERY',
+                    subtitle: 'Place your order before 2 PM for instant same-day delivery.',
+                    buttonText: 'Learn More',
+                    imagePath: 'assets/vegetables.jpeg',
+                    onTap: () {},
+                  ),
+                ],
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                child: Text(
+                  'Categories',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green,
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 50,
-              child: Obx(() => ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    itemCount: _catalogController.categories.length,
-                    itemBuilder: (context, index) {
-                      final categoryItem =
-                          _catalogController.categories[index];
-                      final categoryName = categoryItem.name;
-                      final isSelected = categoryName == selectedCategory;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: ChoiceChip(
-                          label: Text(categoryName),
-                          selected: isSelected,
-                          selectedColor: secondaryColor,
-                          labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : Colors.black,
+              SizedBox(
+                height: 50,
+                child: Obx(() => ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      itemCount: _catalogController.categories.length,
+                      itemBuilder: (context, index) {
+                        final categoryItem =
+                            _catalogController.categories[index];
+                        final categoryName = categoryItem.name;
+                        final isSelected = categoryName == selectedCategory;
+        
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ChoiceChip(
+                            label: Text(categoryName),
+                            selected: isSelected,
+                            selectedColor: secondaryColor,
+                            labelStyle: TextStyle(
+                              color: isSelected ? Colors.white : Colors.black,
+                            ),
+                            onSelected: (bool selected) {
+                              setState(() {
+                                selectedCategory = categoryName;
+                              });
+                            },
                           ),
-                          onSelected: (bool selected) {
-                            setState(() {
-                              selectedCategory = categoryName;
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  )),
-            ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                'Digital Aisles',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        );
+                      },
+                    )),
               ),
-            ),
-            ProductGrid(
-              selectedCategory: selectedCategory,
-              onAddToCart: (product) {
-                cartController.addToCart(product);
-                Get.snackbar(
-                  "${product['name']} Added!",
-                  "Item added to cart",
-                  snackPosition: SnackPosition.BOTTOM,
-                  duration: const Duration(seconds: 1),
-                );
-              },
-            ),
-            const SizedBox(height: 20),
-          ],
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Text(
+                  'Digital Aisles',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              ProductGrid(
+                selectedCategory: selectedCategory,
+                onAddToCart: (product) {
+                  cartController.addToCart(product);
+                  Get.snackbar(
+                    "${product['name']} Added!",
+                    "Item added to cart",
+                    snackPosition: SnackPosition.BOTTOM,
+                    duration: const Duration(seconds: 1),
+                  );
+                },
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
     );

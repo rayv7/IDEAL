@@ -159,7 +159,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   try {
                                     var response = await http.post(
                                       Uri.parse(
-                                          "http://10.0.2.2/backend/create.php"),
+                                        "https://refract-strung-mama.ngrok-free.dev/backend/create.php"
+                                      ),
                                       body: {
                                         "fname": firstNameController.text,
                                         "sname": secondNameController.text,
@@ -169,8 +170,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                       },
                                     );
 
-                                    var serverResponse =
-                                        jsonDecode(response.body);
+                                    var serverResponse = jsonDecode(response.body);
 
                                     if (serverResponse['success'] == 1) {
                                       Get.snackbar("Success",

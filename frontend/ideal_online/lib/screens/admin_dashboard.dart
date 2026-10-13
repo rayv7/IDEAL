@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ideal_online/controllers/catalog_controller.dart';
 import 'package:ideal_online/configs/colors.dart';
+import 'package:ideal_online/services/cloudinary_service.dart';
 import 'package:http/http.dart' as http;
 
 class AdminDashboardScreen extends StatefulWidget {
@@ -54,7 +55,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
         if (categoryName.isNotEmpty) {
           try {
             var response = await http.post(
-              Uri.parse('http://10.0.2.2/backend/add_category.php'),
+              Uri.parse(
+                  'https://refract-strung-mama.ngrok-free.dev/backend/add_category.php'),
               body: {'name': categoryName},
             );
 
@@ -94,7 +96,6 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
   }
 
   void _showAddProductModal(BuildContext context) {
-    // Ensure we have fresh categories from backend when opening modal
     catalogController.fetchCategoriesFromBackend();
 
     final nameController = TextEditingController();
@@ -105,6 +106,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
     String selectedUnitType = 'Litres (L)';
     String? selectedCategoryId;
     File? pickedImageFile;
+    String? uploadedCloudinaryUrl;
+    bool isUploadingImage = false;
 
     showModalBottomSheet(
       context: context,
@@ -115,15 +118,47 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setModalState) {
-            Future<void> pickImage() async {
+            Future<void> pickAndUploadImage() async {
               final picker = ImagePicker();
-              final XFile? image =
-                  await picker.pickImage(source: ImageSource.gallery);
+              final XFile? image = await picker.pickImage(
+                source: ImageSource.gallery,
+                imageQuality: 85,
+              );
+
               if (image != null) {
                 setModalState(() {
                   pickedImageFile = File(image.path);
-                  imagePathController.text = image.path;
+                  isUploadingImage = true;
                 });
+
+                // Upload direct to Cloudinary CDN
+                String? cdnUrl = await CloudinaryService.uploadImage(image);
+
+                setModalState(() {
+                  isUploadingImage = false;
+                  if (cdnUrl != null) {
+                    uploadedCloudinaryUrl = cdnUrl;
+                    imagePathController.text = cdnUrl;
+                  }
+                });
+
+                if (cdnUrl != null) {
+                  Get.snackbar(
+                    'Success',
+                    'Image uploaded to cloud CDN',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.green,
+                    colorText: Colors.white,
+                  );
+                } else {
+                  Get.snackbar(
+                    'Warning',
+                    'Cloud upload failed. Will attempt fallback.',
+                    snackPosition: SnackPosition.BOTTOM,
+                    backgroundColor: Colors.orange,
+                    colorText: Colors.white,
+                  );
+                }
               }
             }
 
@@ -141,7 +176,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                   children: [
                     const Text(
                       'Add New Product',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 16),
                     TextField(
@@ -222,9 +258,9 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                         );
                       }
 
-                      // Ensure selectedCategoryId matches a valid ID in the list
                       if (selectedCategoryId == null ||
-                          !categoriesList.any((c) => c.id == selectedCategoryId)) {
+                          !categoriesList
+                              .any((c) => c.id == selectedCategoryId)) {
                         selectedCategoryId = categoriesList.first.id;
                       }
 
@@ -249,7 +285,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     }),
                     const SizedBox(height: 12),
 
-                    // Image Picker Section
+                    // Cloud Image Picker Section
                     Row(
                       children: [
                         Container(
@@ -260,22 +296,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.grey.shade300),
                           ),
-                          child: pickedImageFile != null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(8),
-                                  child: Image.file(
-                                    pickedImageFile!,
-                                    fit: BoxFit.cover,
-                                  ),
+                          child: isUploadingImage
+                              ? const Padding(
+                                  padding: EdgeInsets.all(16.0),
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2),
                                 )
-                              : const Icon(Icons.image, color: Colors.grey),
+                              : pickedImageFile != null
+                                  ? ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.file(
+                                        pickedImageFile!,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : const Icon(Icons.image, color: Colors.grey),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: OutlinedButton.icon(
-                            onPressed: pickImage,
-                            icon: const Icon(Icons.photo_library),
-                            label: const Text('Pick Image from Gallery'),
+                            onPressed: isUploadingImage ? null : pickAndUploadImage,
+                            icon: const Icon(Icons.cloud_upload_outlined),
+                            label: Text(
+                              isUploadingImage
+                                  ? 'Uploading Image...'
+                                  : 'Pick & Upload Cloud Image',
+                            ),
                             style: OutlinedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
@@ -287,8 +333,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                     TextField(
                       controller: imagePathController,
                       decoration: const InputDecoration(
-                        labelText: 'Or Paste Image URL / Asset Path',
-                        hintText: 'assets/placeholder.png',
+                        labelText: 'Cloud Image URL or Asset Path',
+                        hintText: 'https://res.cloudinary.com/... or assets/placeholder.png',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -300,88 +346,87 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                         style: ElevatedButton.styleFrom(
                           backgroundColor: primaryColor,
                         ),
-                        onPressed: () async {
-                          final name = nameController.text.trim();
-                          final price = priceController.text.trim();
-                          final unitAmount = unitAmountController.text.trim();
-                          final unitLabel = selectedUnitType
-                              .split(' ')
-                              .last
-                              .replaceAll('(', '')
-                              .replaceAll(')', '');
-                          final fullUnit = unitAmount.isNotEmpty
-                              ? '$unitAmount $unitLabel'
-                              : unitLabel;
+                        onPressed: isUploadingImage
+                            ? null
+                            : () async {
+                                final name = nameController.text.trim();
+                                final price = priceController.text.trim();
+                                final unitAmount = unitAmountController.text.trim();
+                                final unitLabel = selectedUnitType
+                                    .split(' ')
+                                    .last
+                                    .replaceAll('(', '')
+                                    .replaceAll(')', '');
+                                final fullUnit = unitAmount.isNotEmpty
+                                    ? '$unitAmount $unitLabel'
+                                    : unitLabel;
 
-                          if (name.isNotEmpty &&
-                              price.isNotEmpty &&
-                              selectedCategoryId != null) {
-                            try {
-                              var request = http.MultipartRequest(
-                                'POST',
-                                Uri.parse('http://10.0.2.2/backend/add_product.php'),
-                              );
+                                final finalImageUrl = imagePathController.text.trim().isNotEmpty
+                                    ? imagePathController.text.trim()
+                                    : (uploadedCloudinaryUrl ?? 'assets/placeholder.png');
 
-                              request.fields['name'] = name;
-                              request.fields['price'] = price;
-                              request.fields['category_id'] = selectedCategoryId!;
-                              request.fields['unit'] = fullUnit;
-                              request.fields['quantity'] = '50';
-                              request.fields['description'] = 'Product description';
+                                if (name.isNotEmpty &&
+                                    price.isNotEmpty &&
+                                    selectedCategoryId != null) {
+                                  try {
+                                    var response = await http.post(
+                                      Uri.parse(
+                                          'https://refract-strung-mama.ngrok-free.dev/backend/add_product.php'),
+                                      body: {
+                                        'name': name,
+                                        'price': price,
+                                        'category_id': selectedCategoryId!,
+                                        'unit': fullUnit,
+                                        'quantity': '50',
+                                        'description': 'Product description',
+                                        'image_url': finalImageUrl,
+                                      },
+                                    );
 
-                              if (pickedImageFile != null) {
-                                request.files.add(
-                                  await http.MultipartFile.fromPath(
-                                      'image', pickedImageFile!.path),
-                                );
-                              } else if (imagePathController.text.isNotEmpty) {
-                                request.fields['image_url'] =
-                                    imagePathController.text.trim();
-                              }
+                                    var body = jsonDecode(response.body);
 
-                              var streamedResponse = await request.send();
-                              var response =
-                                  await http.Response.fromStream(streamedResponse);
+                                    if (response.statusCode == 200 &&
+                                        body['success'] == 1) {
+                                      Get.back();
+                                      await catalogController
+                                          .fetchProductsFromBackend();
 
-                              if (response.statusCode == 200) {
-                                Get.back();
-                                await catalogController.fetchProductsFromBackend();
-
-                                Get.snackbar(
-                                  'Success',
-                                  '$name saved to database successfully',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: Colors.green,
-                                  colorText: Colors.white,
-                                );
-                              } else {
-                                Get.snackbar(
-                                  'Error',
-                                  'Server status code: ${response.statusCode}',
-                                  snackPosition: SnackPosition.BOTTOM,
-                                  backgroundColor: Colors.redAccent,
-                                  colorText: Colors.white,
-                                );
-                              }
-                            } catch (e) {
-                              Get.snackbar(
-                                'Error',
-                                'Could not connect to backend server',
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.redAccent,
-                                colorText: Colors.white,
-                              );
-                            }
-                          } else {
-                            Get.snackbar(
-                              'Error',
-                              'Please fill in product name, price, and select a category',
-                              snackPosition: SnackPosition.BOTTOM,
-                              backgroundColor: Colors.redAccent,
-                              colorText: Colors.white,
-                            );
-                          }
-                        },
+                                      Get.snackbar(
+                                        'Success',
+                                        '$name saved to database successfully',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.green,
+                                        colorText: Colors.white,
+                                      );
+                                    } else {
+                                      Get.snackbar(
+                                        'Error',
+                                        body['message'] ??
+                                            'Server status code: ${response.statusCode}',
+                                        snackPosition: SnackPosition.BOTTOM,
+                                        backgroundColor: Colors.redAccent,
+                                        colorText: Colors.white,
+                                      );
+                                    }
+                                  } catch (e) {
+                                    Get.snackbar(
+                                      'Error',
+                                      'Could not connect to backend server',
+                                      snackPosition: SnackPosition.BOTTOM,
+                                      backgroundColor: Colors.redAccent,
+                                      colorText: Colors.white,
+                                    );
+                                  }
+                                } else {
+                                  Get.snackbar(
+                                    'Error',
+                                    'Please fill in product name, price, and select a category',
+                                    snackPosition: SnackPosition.BOTTOM,
+                                    backgroundColor: Colors.redAccent,
+                                    colorText: Colors.white,
+                                  );
+                                }
+                              },
                         child: const Text(
                           'Save Product',
                           style: TextStyle(color: Colors.white, fontSize: 16),

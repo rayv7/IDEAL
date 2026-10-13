@@ -114,9 +114,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                     return;
                                   }
 
+                                  Get.dialog(
+                                    const Center(
+                                      child: CircularProgressIndicator(
+                                        color: primaryColor,
+                                      ),
+                                    ),
+                                    barrierDismissible: false,
+                                  );
+
                                   // 1. CHECK FOR ADMIN CREDENTIALS FIRST
                                   if (username == adminUsername &&
                                       password == adminPassword) {
+                                    Get.back();
                                     store.write("is_admin", true);
                                     store.write("username", username);
 
@@ -135,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   try {
                                     var response = await http.get(
                                       Uri.parse(
-                                        "http://10.0.2.2/backend/login.php?phonenum=$username&password=$password",
+                                        "https://refract-strung-mama.ngrok-free.dev/backend/login.php?phonenum=$username&password=$password",
                                       ),
                                     );
 
@@ -144,13 +154,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     int loggedIn = responseBody['success'];
 
                                     if (loggedIn == 1) {
-                                      store.write("is_admin", false);
-                                      store.write("username", username);
-                                      store.write(
+                                      Get.back();
+                                      await store.write("is_admin", false);
+                                      await store.write("username", username);
+                                      await store.write("phonenum", username);
+                                      await store.write(
                                         "userID",
                                         responseBody['data'][0]['id'],
                                       );
-                                      store.write(
+                                      await store.write(
                                         "firstname",
                                         responseBody['data'][0]['fname'],
                                       );
@@ -166,6 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       );
                                     }
                                   } catch (e) {
+                                    Get.back();
                                     Get.snackbar(
                                       "Error",
                                       "Could not connect to backend server",

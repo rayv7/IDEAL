@@ -11,6 +11,7 @@ var routes = [
   GetPage(name: "/login", page: () => LoginScreen()),
   GetPage(name: "/registration", page: () => RegistrationScreen()),
   GetPage(name: "/", page: () => IdealMinimartHome()),
+  GetPage(name: "/home", page: () => IdealMinimartHome()),
   GetPage(name: "/profile", page: () => ProfileScreen()),
   GetPage(name: "/categories", page: () => CategoriesScreen()),
   GetPage(name: "/cart", page: () => CartScreen()),

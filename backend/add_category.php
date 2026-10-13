@@ -29,4 +29,3 @@ if (isset($_POST['name']) && !empty(trim($_POST['name']))) {
 
 echo json_encode($response);
 mysqli_close($con);
-?>

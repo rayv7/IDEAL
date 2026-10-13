@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/catalog_controller.dart';
@@ -66,6 +68,47 @@ class _ProductCard extends StatelessWidget {
     this.onAddToCart,
   });
 
+  Widget _buildProductImage(String imagePath) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return CachedNetworkImage(
+          imageUrl: imagePath,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => const Center(
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+          errorWidget: (context, url, error) => const Icon(
+            Icons.wifi_off_outlined, // Shows an offline indicator if image isn't cached
+            size: 40,
+            color: Colors.grey,
+          ),
+        );
+    } else if (File(imagePath).existsSync()) {
+      return Image.file(
+        File(imagePath),
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.image_not_supported_outlined,
+          size: 40,
+          color: Colors.grey,
+        ),
+      );
+    } else {
+      return Image.asset(
+        imagePath.isNotEmpty ? imagePath : 'assets/placeholder.png',
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const Icon(
+          Icons.image_not_supported_outlined,
+          size: 40,
+          color: Colors.grey,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).primaryColor;
@@ -88,15 +131,7 @@ class _ProductCard extends StatelessWidget {
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(12.0)),
                 child: product.imagePath.isNotEmpty
-                    ? Image.asset(
-                        product.imagePath,
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, _, _) => const Icon(
-                          Icons.image_not_supported_outlined,
-                          size: 40,
-                          color: Colors.grey,
-                        ),
-                      )
+                    ? _buildProductImage(product.imagePath)
                     : const Icon(
                         Icons.shopping_bag_outlined,
                         size: 40,

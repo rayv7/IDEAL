@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:ideal_online/configs/routes.dart';
 import 'package:ideal_online/controllers/cart_controller.dart';
 
 
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   Get.put(CartController());
   
-  runApp(IdealMinimart());
+  runApp(const IdealMinimart());
 }
 
 class IdealMinimart extends StatefulWidget {

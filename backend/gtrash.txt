@@ -1,0 +1,42 @@
+<?php
+require 'connect.php';
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
+
+$response = ['success' => 0, 'message' => ''];
+
+$fname = trim($_POST["fname"] ?? '');
+$sname = trim($_POST["sname"] ?? '');
+$phonenum = trim($_POST["phonenum"] ?? '');
+$password = trim($_POST["password"] ?? '');
+$email = trim($_POST["email"] ?? '');
+
+if (empty($fname) || empty($phonenum) || empty($password)) {
+    $response['message'] = "Required fields are missing.";
+    echo json_encode($response);
+    exit;
+}
+
+// Hash the password securely before saving
+$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+$stmt = mysqli_prepare($con, "INSERT INTO users (fname, sname, phonenum, password, email) VALUES (?, ?, ?, ?, ?)");
+
+if ($stmt) {
+    mysqli_stmt_bind_param($stmt, "sssss", $fname, $sname, $phonenum, $hashed_password, $email);
+    
+    if (mysqli_stmt_execute($stmt)) {
+        $response['success'] = 1;
+        $response['message'] = "User registered successfully.";
+    } else {
+        $response['message'] = "Registration failed: Phone number or email may already exist.";
+    }
+    mysqli_stmt_close($stmt);
+} else {
+    $response['message'] = "Database error.";
+}
+
+echo json_encode($response);
+mysqli_close($con);
+?>
