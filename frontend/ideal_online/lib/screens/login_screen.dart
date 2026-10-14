@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   try {
                                     var response = await http.get(
                                       Uri.parse(
-                                        "https://refract-strung-mama.ngrok-free.dev/backend/login.php?phonenum=$username&password=$password",
+                                        "https://ideal-minimart.wauze.com/login.php?phonenum=$username&password=$password",
                                       ),
                                     );
 

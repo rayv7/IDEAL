@@ -48,8 +48,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       var response = await http.get(
         Uri.https(
-          'refract-strung-mama.ngrok-free.dev',
-          '/backend/get_user.php',
+          'ideal-minimart.wuaze.com',
+          '/get_user.php',
           {'phonenum': phone.toString()},
         ),
         headers: {'ngrok-skip-browser-warning': 'true'},

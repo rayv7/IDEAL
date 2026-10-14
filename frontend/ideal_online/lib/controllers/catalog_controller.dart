@@ -73,7 +73,7 @@ class CatalogController extends GetxController {
     try {
       isLoading.value = true;
       var response = await http.get(
-        Uri.parse("https://refract-strung-mama.ngrok-free.dev/backend/get_products.php"),
+        Uri.parse("https://ideal-minimart.wuaze.com/get_products.php"),
       );
 
       if (response.statusCode == 200) {
@@ -93,7 +93,7 @@ class CatalogController extends GetxController {
   Future<void> fetchCategoriesFromBackend() async {
     try {
       var response = await http.get(
-        Uri.parse("https://refract-strung-mama.ngrok-free.dev/backend/get_categories.php"),
+        Uri.parse("https://ideal-minimart.wuaze.com/get_categories.php"),
       );
 
       if (response.statusCode == 200) {

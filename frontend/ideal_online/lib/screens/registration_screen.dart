@@ -159,8 +159,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   try {
                                     var response = await http.post(
                                       Uri.parse(
-                                        "https://refract-strung-mama.ngrok-free.dev/backend/create.php"
+                                        "https://ideal-minimart.wuaze.com/create.php"
                                       ),
+                                      headers: {
+                                        "Content-Type": "application/x-www-form-urlencoded",
+                                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                                      },
                                       body: {
                                         "fname": firstNameController.text,
                                         "sname": secondNameController.text,
@@ -169,6 +173,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                         "password": passwordController.text,
                                       },
                                     );
+                                    print("RAW RESPONSE: ${response.body}");
 
                                     var serverResponse = jsonDecode(response.body);
 

@@ -56,7 +56,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
           try {
             var response = await http.post(
               Uri.parse(
-                  'https://refract-strung-mama.ngrok-free.dev/backend/add_category.php'),
+                  'https://ideal-minimart.wuaze.com/add_category.php'),
+              headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+              },
               body: {'name': categoryName},
             );
 
@@ -371,7 +375,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen>
                                   try {
                                     var response = await http.post(
                                       Uri.parse(
-                                          'https://refract-strung-mama.ngrok-free.dev/backend/add_product.php'),
+                                          'https://ideal-minimart.wuaze.com/add_product.php'),
                                       body: {
                                         'name': name,
                                         'price': price,
